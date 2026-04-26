@@ -74,7 +74,7 @@ const MapSearch: FC<MapSearchProps> = ({ onSelect }) => {
   };
 
   return (
-    <div className="absolute left-12 top-4 z-[1000] w-full max-w-sm">
+    <div className="absolute left-2 right-2 top-2 sm:left-12 sm:top-4 sm:right-auto z-[1000] w-auto sm:w-full sm:max-w-sm">
       <form
         onSubmit={(e) => {
           e.preventDefault();

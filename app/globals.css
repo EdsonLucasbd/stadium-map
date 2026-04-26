@@ -150,3 +150,11 @@
 .leaflet-container a.leaflet-popup-close-button:hover {
   color: var(--foreground) !important;
 }
+
+@media (max-width: 640px) {
+  .leaflet-top.leaflet-left {
+    top: auto;
+    bottom: 120px;
+    left: 10px;
+  }
+}

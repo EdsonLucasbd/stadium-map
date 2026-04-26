@@ -2,6 +2,7 @@ import { handleSignIn, handleSignOut } from "@/app/actions/auth";
 import { GoogleIcon, GithubIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
 export function SignIn({
   provider = "google",
@@ -21,9 +22,9 @@ export function SignIn({
 
   return (
     <form action={signInWithProvider}>
-      <Button {...props} variant="ghost">
-        <HugeiconsIcon icon={icons[provider]} />
-        {labels[provider]}
+      <Button {...props} variant="ghost" className={cn("gap-2", props.className)}>
+        <HugeiconsIcon icon={icons[provider]} className="h-5 w-5 shrink-0" />
+        <span className="hidden sm:inline">{labels[provider]}</span>
       </Button>
     </form>
   );
