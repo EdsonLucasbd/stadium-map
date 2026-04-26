@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { type LocationWithUser } from '@/types/map';
 import { type FC } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import ImageGallery from "./Image-gallery";
+import { ImageGallery } from "./image-gallery";
 
 interface LocationDetailsModalProps {
   location: LocationWithUser | null;
@@ -94,11 +94,11 @@ const LocationDetailsModal: FC<LocationDetailsModalProps> = ({
             {location.galleryUrls && location.galleryUrls.length > 0 && (
               <div>
                 <h4 className="font-semibold text-lg mb-3">Galeria de Imagens</h4>
-                <ImageGallery 
-                  images={location.galleryUrls.map((url, i) => ({ 
-                    src: url, 
-                    alt: `${location.name} - Imagem ${i + 1}` 
-                  }))} 
+                <ImageGallery
+                  images={location.galleryUrls.map((url, i) => ({
+                    src: url,
+                    alt: `${location.name} - Imagem ${i + 1}`
+                  }))}
                 />
               </div>
             )}

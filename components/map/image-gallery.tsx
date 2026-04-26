@@ -13,7 +13,7 @@ interface ImageGalleryProps {
   className?: string;
 }
 
-const ImageGallery = ({ images, className }: ImageGalleryProps) => {
+export const ImageGallery = ({ images, className }: ImageGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const close = useCallback(() => setActiveIndex(null), []);
@@ -130,5 +130,3 @@ const ImageGallery = ({ images, className }: ImageGalleryProps) => {
     </>
   );
 };
-
-export default ImageGallery;

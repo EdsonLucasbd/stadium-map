@@ -15,10 +15,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { type SearchResult } from '@/types/map';
 import { useEffect, useState, type FC } from 'react';
 
-import { Locker01Icon } from '@hugeicons/core-free-icons';
+import { LockPasswordIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useSession } from 'next-auth/react';
 import { SignIn } from '../auth-components';
+import { cn } from '@/lib/utils';
 import { ImageUploader } from './image-uploader';
 
 interface LocationModalProps {
@@ -90,8 +91,28 @@ const LocationModal: FC<LocationModalProps> = ({
         </DialogHeader>
 
         <ScrollArea className="max-h-[80vh] px-6 pb-4">
-          <div className="flex flex-col gap-6 py-4 pb-8">
-            <div className="space-y-4">
+          <div className="relative flex flex-col gap-6 py-4 pb-8">
+            {!isAuthenticated && (
+              <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-lg text-center p-6">
+                <div className="bg-background border shadow-xl p-8 rounded-2xl max-w-sm flex flex-col items-center gap-4 animate-in zoom-in-95 duration-300">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <HugeiconsIcon icon={LockPasswordIcon} className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-lg">Login Necessário</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Você precisa estar autenticado para registrar novos estádios no mapa.
+                    </p>
+                  </div>
+                  <div className="flex flex-col w-full gap-2 mt-2">
+                    <SignIn provider="google" variant="default" className="w-full justify-start gap-3" />
+                    <SignIn provider="github" variant="outline" className="w-full justify-start gap-3" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className={cn("space-y-4", !isAuthenticated && "opacity-40 grayscale-[50%] pointer-events-none select-none")}>
               <div className="space-y-2">
                 <Label htmlFor="stadium-name">Nome do Estádio</Label>
                 <Input
@@ -99,7 +120,7 @@ const LocationModal: FC<LocationModalProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex: Maracanã"
-                  disabled={isSaving}
+                  disabled={isSaving || !isAuthenticated}
                 />
               </div>
 
@@ -110,7 +131,7 @@ const LocationModal: FC<LocationModalProps> = ({
                   value={teamName}
                   onChange={(e) => setTeamName(e.target.value)}
                   placeholder="Nome do time"
-                  disabled={isSaving}
+                  disabled={isSaving || !isAuthenticated}
                 />
               </div>
 
@@ -122,12 +143,12 @@ const LocationModal: FC<LocationModalProps> = ({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Conte um pouco sobre este estádio..."
                   className="min-h-[100px]"
-                  disabled={isSaving}
+                  disabled={isSaving || !isAuthenticated}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className={cn("grid grid-cols-1 gap-6", !isAuthenticated && "opacity-40 grayscale-[50%] pointer-events-none select-none")}>
               <div className="grid grid-cols-2 gap-4">
                 <ImageUploader
                   label="Escudo"
@@ -160,16 +181,7 @@ const LocationModal: FC<LocationModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-t p-6">
-            {!isAuthenticated ? (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <HugeiconsIcon icon={Locker01Icon} className="h-4 w-4" />
-                <span>Faça login para salvar</span>
-                <SignIn provider="google" variant="outline" size="sm" />
-              </div>
-            ) : (
-              <div className="flex-1" />
-            )}
+          <div className="flex items-center justify-end gap-3 border-t p-6">
             <div className="flex gap-3">
               <Button
                 variant="outline"

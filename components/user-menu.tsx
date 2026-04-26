@@ -15,7 +15,12 @@ export async function UserMenu() {
   const session = await auth();
 
   if (!session?.user) {
-    return <SignIn provider="google" />;
+    return (
+      <div className="flex gap-2">
+        <SignIn provider="google" size="sm" />
+        <SignIn provider="github" size="sm" />
+      </div>
+    );
   }
 
   return (
@@ -38,9 +43,7 @@ export async function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <SignOut />
-        </DropdownMenuItem>
+        <SignOut />
       </DropdownMenuContent>
     </DropdownMenu>
   );
