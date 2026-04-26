@@ -42,8 +42,8 @@ const Map: FC<MapProps> = ({
   const [viewingLocation, setViewingLocation] = useState<LocationWithUser | null>(null);
 
   const tileLayerUrl = theme === 'dark'
-    ? "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
 
   const handleLocationSelect = (result: SearchResult) => {
     setSelectedLocation(result);
@@ -79,7 +79,7 @@ const Map: FC<MapProps> = ({
       >
         <TileLayer
           key={tileLayerUrl}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           url={tileLayerUrl}
         />
         <MapSearch onSelect={handleLocationSelect} />
