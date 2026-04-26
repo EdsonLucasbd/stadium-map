@@ -1,6 +1,5 @@
 'use client';
 
-import { type SearchResult } from '@/types/map';
 import L from 'leaflet';
 import 'leaflet-defaulticon-compatibility';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
@@ -23,14 +22,13 @@ import { saveLocationAction } from '@/app/actions/location';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 
-import { type Location } from '@/db/schema';
-import { ThemeToggle } from '../theme-toggle';
+import { type LocationWithUser, type SearchResult } from '@/types/map';
 import { Button } from '../ui/button';
 
 interface MapProps {
   center?: [number, number];
   zoom?: number;
-  savedLocations?: Location[];
+  savedLocations?: LocationWithUser[];
 }
 
 const Map: FC<MapProps> = ({
@@ -41,7 +39,7 @@ const Map: FC<MapProps> = ({
   const { theme } = useTheme();
   const [selectedLocation, setSelectedLocation] = useState<SearchResult | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [viewingLocation, setViewingLocation] = useState<Location | null>(null);
+  const [viewingLocation, setViewingLocation] = useState<LocationWithUser | null>(null);
 
   const tileLayerUrl = theme === 'dark'
     ? "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
@@ -141,10 +139,6 @@ const Map: FC<MapProps> = ({
           </Marker>
         ))}
       </MapContainer>
-
-      <div className="fixed top-4 right-4 z-[1000] pointer-events-auto">
-        <ThemeToggle />
-      </div>
 
       <LocationModal
         isOpen={isModalOpen}

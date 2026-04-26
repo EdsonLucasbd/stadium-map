@@ -8,11 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { type Location } from '@/db/schema';
+import { type LocationWithUser } from '@/types/map';
 import { type FC } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import ImageGallery from "./Image-gallery";
 
 interface LocationDetailsModalProps {
-  location: Location | null;
+  location: LocationWithUser | null;
   onClose: () => void;
 }
 
@@ -76,27 +78,28 @@ const LocationDetailsModal: FC<LocationDetailsModalProps> = ({
               </div>
             )}
 
+            {location.registeredBy && (
+              <div className="flex items-center gap-3 border-t pt-6">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={location.registeredBy.image ?? ""} alt={location.registeredBy.name ?? ""} />
+                  <AvatarFallback>{location.registeredBy.name?.[0] ?? "U"}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <p className="text-xs text-muted-foreground">Registrado por</p>
+                  <p className="text-sm font-medium">{location.registeredBy.name}</p>
+                </div>
+              </div>
+            )}
+
             {location.galleryUrls && location.galleryUrls.length > 0 && (
               <div>
                 <h4 className="font-semibold text-lg mb-3">Galeria de Imagens</h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {location.galleryUrls.map((url, idx) => (
-                    <a
-                      key={idx}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative aspect-video overflow-hidden rounded-md bg-muted"
-                    >
-                      <img
-                        src={url}
-                        alt={`Galeria ${idx + 1}`}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-                    </a>
-                  ))}
-                </div>
+                <ImageGallery 
+                  images={location.galleryUrls.map((url, i) => ({ 
+                    src: url, 
+                    alt: `${location.name} - Imagem ${i + 1}` 
+                  }))} 
+                />
               </div>
             )}
           </div>

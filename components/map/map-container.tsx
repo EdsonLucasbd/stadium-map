@@ -13,12 +13,12 @@ const Map = dynamic(() => import('./map'), {
   ),
 });
 
-import { type Location } from '@/db/schema';
+import { type LocationWithUser } from '@/types/map';
 
 interface MapContainerProps {
   center?: [number, number];
   zoom?: number;
-  savedLocations?: Location[];
+  savedLocations?: LocationWithUser[];
 }
 
 const MapWrapper: FC<MapContainerProps> = (props) => {

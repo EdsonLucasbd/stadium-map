@@ -15,6 +15,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { type SearchResult } from '@/types/map';
 import { useEffect, useState, type FC } from 'react';
 
+import { Locker01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { useSession } from 'next-auth/react';
+import { SignIn } from '../auth-components';
 import { ImageUploader } from './image-uploader';
 
 interface LocationModalProps {
@@ -37,6 +41,9 @@ const LocationModal: FC<LocationModalProps> = ({
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const { data: session } = useSession();
+
+  const isAuthenticated = !!session?.user;
 
   useEffect(() => {
     if (location && isOpen) {
@@ -153,20 +160,31 @@ const LocationModal: FC<LocationModalProps> = ({
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t p-6">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSaving}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={isSaving}
-            >
-              {isSaving ? 'Salvando...' : 'Salvar Local'}
-            </Button>
+          <div className="flex items-center justify-between gap-3 border-t p-6">
+            {!isAuthenticated ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <HugeiconsIcon icon={Locker01Icon} className="h-4 w-4" />
+                <span>Faça login para salvar</span>
+                <SignIn provider="google" variant="outline" size="sm" />
+              </div>
+            ) : (
+              <div className="flex-1" />
+            )}
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isSaving}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={isSaving || !isAuthenticated}
+              >
+                {isSaving ? 'Salvando...' : 'Salvar Local'}
+              </Button>
+            </div>
           </div>
         </ScrollArea>
 

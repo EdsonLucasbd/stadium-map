@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 }
 
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "@/components/providers";
 
 export default function RootLayout({
   children,
@@ -45,10 +46,10 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, "font-sans", inter.variable, outfitHeading.variable)}
     >
       <body>
-        <ThemeProvider>
+        <Providers>
           {children}
           <Toaster />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )
