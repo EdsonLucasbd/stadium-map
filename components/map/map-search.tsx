@@ -36,7 +36,7 @@ const MapSearch: FC<MapSearchProps> = ({ onSelect }) => {
         `https://nominatim.openstreetmap.org/search?format=json&q=stadium+${encodeURIComponent(searchTerm)}&limit=10&addressdetails=1`
       );
       const data = await response.json();
-      
+
       // Optional: Filter results that are actually stadiums if needed
       // but usually the 'stadium' prefix in the query is enough for Nominatim.
       setResults(data);
