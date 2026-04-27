@@ -46,8 +46,22 @@ const Map: FC<MapProps> = ({
     : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
 
   const handleLocationSelect = (result: SearchResult) => {
-    setSelectedLocation(result);
-    setIsModalOpen(true);
+    const lat = parseFloat(result.lat);
+    const lon = parseFloat(result.lon);
+
+    const THRESHOLD = 0.001;
+    const existingLocation = savedLocations.find(
+      (loc) =>
+        Math.abs(loc.latitude - lat) < THRESHOLD &&
+        Math.abs(loc.longitude - lon) < THRESHOLD
+    );
+
+    if (existingLocation) {
+      setViewingLocation(existingLocation);
+    } else {
+      setSelectedLocation(result);
+      setIsModalOpen(true);
+    }
   };
 
   const handleSave = async (formData: FormData) => {
