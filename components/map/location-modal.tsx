@@ -11,15 +11,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
 import { type SearchResult } from '@/types/map';
 import { useEffect, useState, type FC } from 'react';
 
-import { LockPasswordIcon } from '@hugeicons/core-free-icons';
+import { useGenerateDescription } from '@/hooks/useGenerateDescription';
+import { cn } from '@/lib/utils';
+import { LockPasswordIcon, SparklesIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 import { SignIn } from '../auth-components';
-import { cn } from '@/lib/utils';
+import { Textarea } from '../ui/textarea';
 import { ImageUploader } from './image-uploader';
 
 interface LocationModalProps {
@@ -43,8 +45,26 @@ const LocationModal: FC<LocationModalProps> = ({
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const { data: session } = useSession();
+  const { generateDescription, isLoading: isGenerating, error: generateError } = useGenerateDescription();
 
   const isAuthenticated = !!session?.user;
+
+  const handleGenerateDescription = async () => {
+    if (!name || !teamName) {
+      toast.error('Preencha o nome do estádio e do time primeiro.');
+      return;
+    }
+    const generatedDesc = await generateDescription({
+      nomeEstadio: name,
+      nomeTime: teamName,
+    });
+    if (generatedDesc) {
+      setDescription(generatedDesc);
+      toast.success('Descrição gerada com sucesso!');
+    } else if (generateError) {
+      toast.error(generateError);
+    }
+  };
 
   useEffect(() => {
     if (location && isOpen) {
@@ -136,7 +156,20 @@ const LocationModal: FC<LocationModalProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stadium-description">Descrição</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="stadium-description">Descrição</Label>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleGenerateDescription}
+                    disabled={isGenerating || !name || !teamName || !isAuthenticated}
+                    className="h-7 text-xs gap-1.5"
+                  >
+                    <HugeiconsIcon icon={SparklesIcon} className="h-3 w-3" />
+                    {isGenerating ? 'Gerando...' : 'Gerar com IA'}
+                  </Button>
+                </div>
                 <Textarea
                   id="stadium-description"
                   value={description}
