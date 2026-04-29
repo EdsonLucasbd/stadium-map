@@ -99,3 +99,80 @@ export async function saveLocationAction(formData: FormData) {
     };
   }
 }
+
+export async function updateLocationAction(formData: FormData) {
+  try {
+    const session = await auth();
+    
+    if (!session?.user?.id) {
+      return { 
+        success: false, 
+        message: 'Você precisa estar logado para editar um local.' 
+      };
+    }
+    const id = parseInt(formData.get('id') as string, 10);
+    const name = formData.get('name') as string;
+    const teamName = formData.get('teamName') as string;
+    const description = formData.get('description') as string;
+
+    const existingLocation = await db.select()
+      .from(locations)
+      .where(eq(locations.id, id))
+      .limit(1);
+
+    if (existingLocation.length === 0) {
+      return { success: false, message: 'Local não encontrado.' };
+    }
+
+    if (existingLocation[0].registeredById !== session.user.id) {
+      return { success: false, message: 'Você não tem permissão para editar este local.' };
+    }
+
+    const sanitizedName = name.replace(/[^a-zA-Z0-9-_\s]/g, '').trim() || 'Estadio_Sem_Nome';
+    const folderPath = `stadium-map/${sanitizedName}`;
+
+    const uploadFile = async (file: File | null) => {
+      if (!file || file.size === 0) return null;
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      return uploadToCloudinary(buffer, folderPath);
+    };
+
+    const shieldFile = formData.get('shield') as File | null;
+    const coverFile = formData.get('cover') as File | null;
+    const galleryFiles = formData.getAll('gallery') as File[];
+
+    const [newShieldUrl, newCoverUrl, ...newGalleryUrls] = await Promise.all([
+      uploadFile(shieldFile),
+      uploadFile(coverFile),
+      ...galleryFiles.map(file => uploadFile(file))
+    ]);
+
+    const validNewGalleryUrls = newGalleryUrls.filter(url => url !== null) as string[];
+
+    await db.update(locations)
+      .set({
+        name,
+        teamName,
+        description,
+        ...(newShieldUrl ? { shieldUrl: newShieldUrl } : {}),
+        ...(newCoverUrl ? { coverUrl: newCoverUrl } : {}),
+        ...(validNewGalleryUrls.length > 0 ? { galleryUrls: validNewGalleryUrls } : {})
+      })
+      .where(eq(locations.id, id));
+
+    revalidatePath('/');
+
+    return { 
+      success: true, 
+      message: 'Local atualizado com sucesso!' 
+    };
+
+  } catch (error) {
+    console.error('Error updating location:', error);
+    return { 
+      success: false, 
+      message: 'Ocorreu um erro ao atualizar o local. Tente novamente mais tarde.' 
+    };
+  }
+}

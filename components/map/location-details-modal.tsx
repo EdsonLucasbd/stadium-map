@@ -9,20 +9,30 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type LocationWithUser } from '@/types/map';
+import { Edit02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useSession } from "next-auth/react";
 import { type FC } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Button } from "../ui/button";
 import { ImageGallery } from "./image-gallery";
 
 interface LocationDetailsModalProps {
   location: LocationWithUser | null;
   onClose: () => void;
+  onEdit?: () => void;
 }
 
 const LocationDetailsModal: FC<LocationDetailsModalProps> = ({
   location,
-  onClose
+  onClose,
+  onEdit
 }) => {
+  const { data: session } = useSession();
+
   if (!location) return null;
+
+  const isOwner = session?.user?.id === location.registeredById;
 
   return (
     <Dialog open={!!location} onOpenChange={(open) => !open && onClose()}>
@@ -65,6 +75,14 @@ const LocationDetailsModal: FC<LocationDetailsModalProps> = ({
               </DialogDescription>
             </div>
           </div>
+          {isOwner && (
+            <div className="absolute top-4 right-4">
+              <Button onClick={onEdit} variant="secondary" size="sm" className="gap-2 shadow-md">
+                <HugeiconsIcon icon={Edit02Icon} className="h-4 w-4" />
+                Editar
+              </Button>
+            </div>
+          )}
         </DialogHeader>
 
         <ScrollArea className="max-h-[50vh] px-6">

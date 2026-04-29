@@ -8,6 +8,7 @@ import { useState, type FC } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { LocationDetailsModal } from './location-details-modal';
 import { LocationModal } from './location-modal';
+import { EditLocationModal } from './edit-location-modal';
 import { MapSearch } from './map-search';
 
 const customIcon = new L.Icon({
@@ -17,7 +18,7 @@ const customIcon = new L.Icon({
   popupAnchor: [0, -40],
 });
 
-import { saveLocationAction } from '@/app/actions/location';
+import { saveLocationAction, updateLocationAction } from '@/app/actions/location';
 
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ const Map: FC<MapProps> = ({
   const { theme } = useTheme();
   const [selectedLocation, setSelectedLocation] = useState<SearchResult | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [viewingLocation, setViewingLocation] = useState<LocationWithUser | null>(null);
 
   const tileLayerUrl = theme === 'dark'
@@ -79,6 +81,26 @@ const Map: FC<MapProps> = ({
       },
       error: (err) => {
         return err instanceof Error ? err.message : 'Falha ao salvar. Verifique sua conexão.';
+      }
+    });
+  };
+
+  const handleEdit = async (formData: FormData) => {
+    const promise = updateLocationAction(formData);
+
+    toast.promise(promise, {
+      loading: 'Atualizando localização do estádio...',
+      success: (result) => {
+        if (result.success) {
+          setIsEditModalOpen(false);
+          setViewingLocation(null);
+          return result.message;
+        } else {
+          throw new Error(result.message);
+        }
+      },
+      error: (err) => {
+        return err instanceof Error ? err.message : 'Falha ao atualizar. Verifique sua conexão.';
       }
     });
   };
@@ -161,9 +183,19 @@ const Map: FC<MapProps> = ({
         onSave={handleSave}
       />
 
+      <EditLocationModal
+        isOpen={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        location={viewingLocation}
+        onSave={handleEdit}
+      />
+
       <LocationDetailsModal
         location={viewingLocation}
         onClose={() => setViewingLocation(null)}
+        onEdit={() => {
+          setIsEditModalOpen(true);
+        }}
       />
     </>
   );
